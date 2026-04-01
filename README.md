@@ -23,16 +23,12 @@ A startup runway calculator built with Next.js that helps founders track burn ra
 
 ## Getting Started
 
-### Prerequisites
-
-- Node.js 20+
-- pnpm
-
-### Install
-
 ```bash
-pnpm install
+make install
+make dev
 ```
+
+Open [http://localhost:3000](http://localhost:3000).
 
 ### Environment Variables
 
@@ -45,14 +41,6 @@ BREX_API_TOKEN=           # Brex API token (scopes: transactions.card.readonly, 
 ```
 
 The Google OAuth redirect URI should be set to `http://localhost:3000/api/auth/google/callback`.
-
-### Run
-
-```bash
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
 
 ## Project Structure
 
