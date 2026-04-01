@@ -8,6 +8,7 @@ import TripManager from "@/components/TripManager";
 import ExpenseManager from "@/components/ExpenseManager";
 import RevenueManager from "@/components/RevenueManager";
 import BrexConnector from "@/components/BrexConnector";
+import DeelConnector from "@/components/DeelConnector";
 import { useRunwayStore } from "@/store/runway-store";
 
 const tabs = [
@@ -101,6 +102,7 @@ export default function Home() {
         <div className="space-y-3 mb-8">
           <SheetConnector onConnected={handleRefresh} />
           <BrexConnector />
+          <DeelConnector />
         </div>
         {activeTab === "dashboard" && <Dashboard />}
         {activeTab === "revenue" && <RevenueManager />}

@@ -31,12 +31,17 @@ interface RunwayActions {
   setMonthlyOfficeCost: (amount: number) => void;
   setBrexToken: (token: string) => void;
   syncBrex: () => Promise<void>;
+  setDeelToken: (token: string) => void;
+  syncDeel: () => Promise<void>;
 }
 
 export interface RunwayStore extends RunwayState, SheetConfig, RunwayActions {
   brexToken: string;
   brexSyncing: boolean;
   brexLastSynced: string | null;
+  deelToken: string;
+  deelSyncing: boolean;
+  deelLastSynced: string | null;
   loading: boolean;
   error: string | null;
   lastFetched: string | null; // ISO string for serialization
@@ -72,6 +77,9 @@ export const useRunwayStore = create<RunwayStore>()(
       brexToken: "",
       brexSyncing: false,
       brexLastSynced: null,
+      deelToken: "",
+      deelSyncing: false,
+      deelLastSynced: null,
       loading: false,
       error: null,
       lastFetched: null,
@@ -240,6 +248,33 @@ export const useRunwayStore = create<RunwayStore>()(
           set({ error: e instanceof Error ? e.message : "Brex sync failed" });
         } finally {
           set({ brexSyncing: false });
+        }
+      },
+
+      // --- Deel ---
+      setDeelToken: (token) => set({ deelToken: token }),
+
+      syncDeel: async () => {
+        const { deelToken } = get();
+        if (!deelToken) return;
+        set({ deelSyncing: true, error: null });
+        try {
+          const { syncFromDeel } = await import("@/lib/deel");
+          const result = await syncFromDeel(deelToken);
+
+          // Replace all employees with Deel data
+          set({
+            employees: result.employees,
+            deelLastSynced: new Date().toISOString(),
+          });
+
+          // Sync to Google Sheet
+          const { employeesToRows } = await import("@/lib/google-sheets");
+          syncTab("Employees", employeesToRows(get().employees));
+        } catch (e) {
+          set({ error: e instanceof Error ? e.message : "Deel sync failed" });
+        } finally {
+          set({ deelSyncing: false });
         }
       },
 
