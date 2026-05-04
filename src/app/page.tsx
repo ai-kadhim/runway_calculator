@@ -8,7 +8,7 @@ import TripManager from "@/components/TripManager";
 import ExpenseManager from "@/components/ExpenseManager";
 import RevenueManager from "@/components/RevenueManager";
 import BrexConnector from "@/components/BrexConnector";
-import DeelConnector from "@/components/DeelConnector";
+import InvestorExport from "@/components/InvestorExport";
 import { useRunwayStore } from "@/store/runway-store";
 
 const tabs = [
@@ -17,6 +17,7 @@ const tabs = [
   { id: "employees", label: "Employees & Deel" },
   { id: "expenses", label: "Expenses" },
   { id: "trips", label: "Trips" },
+  { id: "investor", label: "Investor Export" },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -102,13 +103,13 @@ export default function Home() {
         <div className="space-y-3 mb-8">
           <SheetConnector onConnected={handleRefresh} />
           <BrexConnector />
-          <DeelConnector />
         </div>
         {activeTab === "dashboard" && <Dashboard />}
         {activeTab === "revenue" && <RevenueManager />}
         {activeTab === "employees" && <EmployeeManager />}
         {activeTab === "expenses" && <ExpenseManager />}
         {activeTab === "trips" && <TripManager />}
+        {activeTab === "investor" && <InvestorExport />}
       </div>
     </main>
   );

@@ -26,9 +26,11 @@ const emptyForm: Omit<Employee, "id"> = {
 export default function EmployeeManager() {
   const employees = useRunwayStore((s) => s.employees);
   const addEmployee = useRunwayStore((s) => s.addEmployee);
+  const updateEmployee = useRunwayStore((s) => s.updateEmployee);
   const removeEmployees = useRunwayStore((s) => s.removeEmployees);
 
   const [formOpen, setFormOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<Omit<Employee, "id">>(emptyForm);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
@@ -57,9 +59,37 @@ export default function EmployeeManager() {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!form.name.trim() || !form.role.trim()) return;
-    addEmployee(form);
+    
+    if (editingId) {
+      updateEmployee(editingId, form);
+      setEditingId(null);
+    } else {
+      addEmployee(form);
+    }
+    
     setForm(emptyForm);
     setFormOpen(false);
+  }
+
+  function handleEdit(emp: Employee) {
+    setForm({
+      name: emp.name,
+      role: emp.role,
+      monthlySalaryUsd: emp.monthlySalaryUsd,
+      startDate: emp.startDate,
+      country: emp.country,
+      deelContractType: emp.deelContractType,
+      deelFeeMonthly: emp.deelFeeMonthly,
+    });
+    setEditingId(emp.id);
+    setFormOpen(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function handleCancel() {
+    setFormOpen(false);
+    setEditingId(null);
+    setForm(emptyForm);
   }
 
   return (
@@ -86,7 +116,7 @@ export default function EmployeeManager() {
           )}
           <button
             type="button"
-            onClick={() => setFormOpen((o) => !o)}
+            onClick={formOpen ? handleCancel : () => setFormOpen(true)}
             className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500"
           >
             {formOpen ? "Cancel" : "+ Add Employee"}
@@ -148,7 +178,7 @@ export default function EmployeeManager() {
           </div>
           <div className="flex items-end sm:col-span-2 lg:col-span-2">
             <button type="submit" className="rounded-lg bg-emerald-600 px-6 py-2 text-sm font-medium text-white transition hover:bg-emerald-500">
-              Add Employee
+              {editingId ? "Update Employee" : "Add Employee"}
             </button>
           </div>
         </form>
@@ -196,7 +226,13 @@ export default function EmployeeManager() {
                     </span>
                   </td>
                   <td className="py-3 pr-4 text-right tabular-nums text-slate-300">{formatUsd(emp.deelFeeMonthly)}</td>
-                  <td className="py-3 text-right">
+                  <td className="py-3 text-right space-x-2">
+                    <button type="button"
+                      onClick={() => handleEdit(emp)}
+                      className="rounded-md px-2 py-1 text-xs font-medium text-indigo-400 opacity-0 transition hover:bg-indigo-500/15 group-hover:opacity-100"
+                      title={`Edit ${emp.name}`}>
+                      Edit
+                    </button>
                     <button type="button"
                       onClick={() => { removeEmployees([emp.id]); setSelected((p) => { const n = new Set(p); n.delete(emp.id); return n; }); }}
                       className="rounded-md px-2 py-1 text-xs font-medium text-red-400 opacity-0 transition hover:bg-red-500/15 group-hover:opacity-100"
